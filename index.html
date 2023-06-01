@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hangman</title>
+  <style>
+    .hangman {
+      display: flex;
+      flex-wrap: wrap;
+      width: 400px;
+    }
+
+    .hangman .letter {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 4px;
+    }
+
+    .hangman .word {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .hangman .word .letter {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 4px;
+    }
+
+    .hangman .input-container {
+      margin-bottom: 20px;
+    }
+
+    .hangman input {
+      width: 200px;
+      padding: 5px;
+      font-size: 18px;
+    }
+
+    .hangman button {
+      padding: 5px 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .hangman .message {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hangman</h1>
+  <div class="hangman">
+    <div class="word"></div>
+    <div class="input-container">
+      <input type="text" id="guess-input" maxlength="1" />
+      <button id="guess-button">Guess</button>
+    </div>
+    <div class="message"></div>
+  </div>
+
+  <script>
+    // Game state
+    let word = 'hangman';
+    let guesses = [];
+    let remainingGuesses = 6;
+
+    // DOM elements
+    const wordElement = document.querySelector('.word');
+    const messageElement = document.querySelector('.message');
+    const guessInput = document.getElementById('guess-input');
+    const guessButton = document.getElementById('guess-button');
+
+    // Initialize game
+    function initializeGame() {
+      // Clear previous state
+      guesses = [];
+      remainingGuesses = 6;
+      messageElement.textContent = '';
+
+      // Generate word display
+      wordElement.innerHTML = '';
+      for (let i = 0; i < word.length; i++) {
+        const letter = document.createElement('div');
+        letter.classList.add('letter');
+        wordElement.appendChild(letter);
+      }
+
+      // Add event listener to guess button
+      guessButton.addEventListener('click', makeGuess);
+
+      // Focus input field
+      guessInput.focus();
+    }
+
+    // Make a guess
+    function makeGuess() {
+      const guess = guessInput.value.toLowerCase();
+      guessInput.value = '';
+
+      if (guess.length !== 1 || !/[a-z]/.test(guess)) {
+        showMessage('Please enter a valid single letter.');
+        return;
+      }
+
+      if (guesses.includes(guess)) {
+        showMessage('You already guessed that letter.');
+        return;
+      }
+
+      guesses.push(guess);
+      updateWordDisplay();
+      checkGameState();
+    }
+
+    // Update the word display
+    function updateWordDisplay() {
+      const letters = wordElement.getElementsByClassName('letter');
+      for (let i = 0; i <
