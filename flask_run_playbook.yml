@@ -1,6 +1,6 @@
 ---
 - name: Install Flask and Run the Application
-  hosts: flask
+  hosts: localhost
   become: true
   tasks:
     - name: Install Flask and other dependencies
