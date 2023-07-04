@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        TEST_SRV_IP = '18.234.187.66'
+        TEST_SRV_IP = '44.204.153.235'
         PROD_SRV_IP = '44.204.161.34'
     }
     stages {
