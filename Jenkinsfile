@@ -3,6 +3,7 @@ pipeline {
     environment {
         TEST_SRV_IP = '44.204.153.235'
         PROD_SRV_IP = '44.204.161.34'
+        AWS_DEFAULT_REGION = us-east-1
     }
     stages {
         stage('Cleanup') {
