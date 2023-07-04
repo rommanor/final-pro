@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sh 'echo "Performing cleanup..."'
                 sh 'rm -rf *'
-                sh 'docker image prune -a '
+                sh 'docker image prune -a -f '
                 sh 'docker container prune -f '
             }
         }
