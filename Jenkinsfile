@@ -43,7 +43,6 @@ pipeline {
         stage('prep test srv') {
           steps {
            script{
-            sh 'aws ec2 start-instances --instance-ids i-048cbf0603135f4a6'
             sh 'echo "Pulling Docker image from Docker Hub..."'
             sh '''
             ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/rom2001.pem ec2-user@${TEST_SRV_IP} '
