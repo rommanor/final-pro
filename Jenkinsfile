@@ -49,7 +49,7 @@ pipeline {
             sudo dnf update -y
             sudo dnf install docker -y
             sudo systemctl start docker
-            sudo systemctl ensble docker
+            sudo systemctl enable docker
             docker stop \$(docker ps -q)
             sudo docker run -d -p 5000:5000 --rm --name my-container rommanor/final-pro
             '
