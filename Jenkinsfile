@@ -45,7 +45,7 @@ pipeline {
            script{
             sh 'echo "Pulling Docker image from Docker Hub..."'
             sh '''
-            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/rom2001.pem ec2-user@${TEST_SRV_IP} '
+            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom2001.pem ec2-user@${TEST_SRV_IP} '
             sudo dnf update -y
             sudo dnf install docker -y
             sudo systemctl start docker
