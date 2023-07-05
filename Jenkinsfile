@@ -72,14 +72,13 @@ pipeline {
 
 stage('deploy to prod') {
     steps {
+           steps {
            script{
+            sh 'echo "Pulling Docker image from Docker Hub..."'
             sh '''
             ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${PROD_SRV_IP} '
-            sudo dnf update -y
-            sudo dnf install docker -y
-            sudo systemctl start docker
-            sudo systemctl ensble docker
-            docker stop \$(docker ps -q)
+            sudo yum install docker -y
+            sudo systemctl restart docker
             sudo docker run -d -p 5000:5000 --rm --name my-container rommanor/final-pro
             '
             '''
