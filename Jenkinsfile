@@ -72,7 +72,7 @@ pipeline {
 
 stage('deploy to prod') {
     steps {
-           steps {
+           
            script{
             sh 'echo "Pulling Docker image from Docker Hub..."'
             sh '''
