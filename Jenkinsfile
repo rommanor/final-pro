@@ -57,12 +57,13 @@ pipeline {
         stage('Testing') {
     steps {
         script {
-            def response = sh(returnStatus: true, script: "curl -s -o /dev/null -w '%{http_code}' ${TEST_SRV_IP}:5000")
-            if (response == 0) {
-                echo 'Flask app returned a 200 status code. Test passed!'
-            } else {
-                echo "Curl command failed with exit code: ${response}"
-                error('Test failed!') // Abort the pipeline with an error status
+              def response = sh(returnStdout: true, script: "curl -s -o /dev/null -w '%{http_code}' http://${TEST_SRV_IP}:5000")
+                    //check if its available
+                    if (response.trim() == '200') {
+                        echo 'Flask app returned a 200 status code. Test passed!'
+                    } else {
+                        echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
+                        error('Test failed!') // Abort the pipeline with an error status
             }
         }
     }
