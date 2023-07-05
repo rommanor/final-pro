@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         TEST_SRV_IP = '3.84.32.91'
-        PROD_SRV_IP = '44.204.161.34'
+        PROD_SRV_IP = '107.20.0.154'
         AWS_DEFAULT_REGION = 'us-east-1'
     }
     stages {
@@ -75,9 +75,8 @@ pipeline {
 stage('deploy to prod') {
     steps {
            script{
-            sh 'aws ec2 start-instances --instance-ids i-0d2915f4e2c6d3e0e'
             sh '''
-            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/rom2001.pem ec2-user@${PROD_SRV_IP} '
+            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${PROD_SRV_IP} '
             sudo dnf update -y
             sudo dnf install docker -y
             sudo systemctl start docker
