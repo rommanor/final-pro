@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        TEST_SRV_IP = '3.84.32.91'
+        TEST_SRV_IP = '44.201.211.244'
         PROD_SRV_IP = '107.20.0.154'
         AWS_DEFAULT_REGION = 'us-east-1'
     }
