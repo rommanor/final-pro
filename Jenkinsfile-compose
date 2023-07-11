@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        TEST_SRV_IP = '54.161.93.97'
-        PROD_SRV_IP = '107.20.0.154'
+        TEST_SRV_IP = '54.234.246.190'
+        PROD_SRV_IP = '3.91.232.37'
         AWS_DEFAULT_REGION = 'us-east-1'
     }
     stages {
