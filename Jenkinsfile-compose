@@ -44,9 +44,7 @@ pipeline {
           steps {
            script{
             sh 'echo "Pulling Docker image from Docker Hub..."'
-            //sh "scp -o  UserKnowsHostsFile=/dev/null -o SrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${TEST_SRV_IP}:/home/ec2-user"
             sh "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${TEST_SRV_IP}:/home/ec2-user"
-
             sh '''
             ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${TEST_SRV_IP} '
             sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
@@ -76,14 +74,15 @@ pipeline {
 
 stage('deploy to prod') {
     steps {
-           
-           script{
+            script{
             sh 'echo "Pulling Docker image from Docker Hub..."'
+            sh "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${PROD_SRV_IP}:/home/ec2-user"
             sh '''
             ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${PROD_SRV_IP} '
-            sudo yum install docker -y
+            sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
+            sudo chmod +x /usr/local/bin/docker-compose
             sudo systemctl restart docker
-            sudo docker run -d -p 5000:5000 --rm --name my-container rommanor/final-pro
+            sudo docker-compose up -d
             '
             '''
             }
