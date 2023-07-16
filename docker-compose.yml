@@ -2,9 +2,7 @@ version: '3'
 
 services:
   flask-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: rommanor/final-pro:latest
     ports:
       - 5000:5000
     volumes:
