@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh 'echo "Building Docker image..."'
                 dir('final-pro') {
-                    sh "docker build -t rommanor/final-pro:latest ."
+                sh "docker build -t rommanor/final-pro:latest ."
                 }
             }
         }
@@ -33,10 +33,10 @@ pipeline {
             steps {
                 sh 'echo "Pushing Docker image to Docker Hub..."'
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh '''
-                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-                    docker push rommanor/final-pro
-                    '''
+                sh '''
+                docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                docker push rommanor/final-pro
+                '''
                 }
             }
         }
@@ -60,12 +60,12 @@ pipeline {
     steps {
         script {
               def response = sh(returnStdout: true, script: "curl -s -o /dev/null -w '%{http_code}' http://${TEST_SRV_IP}:5000")
-                    //check if its available
-                    if (response.trim() == '200') {
-                        echo 'Flask app returned a 200 status code. Test passed!'
+                //check if its available
+               if (response.trim() == '200') {
+               echo 'Flask app returned a 200 status code. Test passed!'
                     } else {
-                        echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
-                        error('Test failed!') // Abort the pipeline with an error status
+               echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
+               error('Test failed!') // Abort the pipeline with an error status
             }
         }
     }
