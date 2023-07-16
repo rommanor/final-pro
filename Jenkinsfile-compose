@@ -45,6 +45,7 @@ pipeline {
            script{
             //sh 'git clone https://github.com/rommanor/final-pro.git'
             sh 'echo "Pulling Docker image from Docker Hub..."'
+            sh "scp -o  UserKnowsHostsFile=/dev/null -o SrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${TEST_SRV_IP}:/home/ec2-user"
             sh '''
             ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${TEST_SRV_IP} '
               sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
