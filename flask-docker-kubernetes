@@ -18,7 +18,6 @@ pipeline {
             steps {
                 sh 'echo "Building..."'
                 sh 'git clone https://github.com/rommanor/final-pro.git'
-                
             }
         }
         stage('Build Docker Image') {
@@ -54,10 +53,13 @@ pipeline {
                 }
             }
         }
-      
         stage('Testing') {
             steps {
-                // Testing steps remain the same
+                script {
+                    sh 'echo "Running tests..."'
+                    // Add your testing steps here
+                    // Example: Run tests using pytest or curl
+                }
             }
         }
         stage('deploy to cluster') {
