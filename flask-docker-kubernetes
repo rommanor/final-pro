@@ -1,1 +1,92 @@
+pipeline {
+    agent any
+    environment {
+        TEST_SRV_IP = '52.90.51.201'
+        PROD_SRV_IP = '3.83.176.126'
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                sh 'echo "Performing cleanup..."'
+                sh 'rm -rf *'
+                sh 'docker image prune -a -f '
+                sh 'docker container prune -f '
+            }
+        }
+        stage('Clone') {
+            steps {
+                sh 'echo "Building..."'
+                sh 'git clone https://github.com/rommanor/final-pro.git'
+                
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo "Building Docker image..."'
+                dir('final-pro') {
+                sh "docker build -t rommanor/final-pro:latest ."
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'echo "Pushing Docker image to Docker Hub..."'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                sh '''
+                docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                docker push rommanor/final-pro
+                '''
+                }
+            }
+        }
+        stage('prep test srv') {
+          steps {
+           script{
+            sh 'echo "Pulling Docker image from Docker Hub..."'
+            sh "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${TEST_SRV_IP}:/home/ec2-user"
+            sh '''
+            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${TEST_SRV_IP} '
+            sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
+            sudo chmod +x /usr/local/bin/docker-compose
+            sudo systemctl restart docker
+            sudo docker-compose up -d
+            '
+            '''
+        }
+    }
+}
+        stage('Testing') {
+    steps {
+        script {
+              def response = sh(returnStdout: true, script: "curl -s -o /dev/null -w '%{http_code}' http://${TEST_SRV_IP}:5000")
+                //check if its available
+               if (response.trim() == '200') {
+               echo 'Flask app returned a 200 status code. Test passed!'
+                    } else {
+               echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
+               error('Test failed!') // Abort the pipeline with an error status
+            }
+        }
+    }
+}
 
+
+stage('deploy to cluster') {
+    steps {
+            script{
+            sh 'echo "Pulling Docker image from Docker Hub..."'
+            sh "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /var/lib/jenkins/rom01.pem /var/lib/jenkins/workspace/flask-docker-compose/final-pro/docker-compose.yml ec2-user@${PROD_SRV_IP}:/home/ec2-user"
+            sh '''
+            ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/rom01.pem ec2-user@${PROD_SRV_IP} '
+            sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
+            sudo chmod +x /usr/local/bin/docker-compose
+            sudo systemctl restart docker
+            sudo docker-compose up -d
+            '
+            '''
+            }
+        }
+    }
+}
+}
