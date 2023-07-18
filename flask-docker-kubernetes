@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        TEST_SRV_IP = '192.168.56.1' // Update with Rancher Desktop IP
-        PROD_SRV_IP = 'YOUR_PROD_SERVER_IP' // Update with your Google Cloud server IP
-        //AWS_DEFAULT_REGION = 'us-east-1'
+        TEST_SRV_IP = '52.90.51.201'
+        PROD_SRV_IP = '3.83.176.126'
+        AWS_DEFAULT_REGION = 'us-east-1'
     }
     stages {
         stage('Cleanup') {
