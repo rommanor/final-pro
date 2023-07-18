@@ -54,6 +54,7 @@ pipeline {
            }
           }
         }
+      }
         stage('Testing') {
             steps {
                 // Testing steps remain the same
