@@ -54,8 +54,12 @@ pipeline {
             steps {
                 script {
                     sh 'echo "Running tests..."'
-                    // Add your testing steps here
-                    // Example: Run tests using pytest or curl
+                     //check if its available
+                 if (response.trim() == '200') {
+                 echo 'Flask app returned a 200 status code. Test passed!'
+                     } else {
+                 echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
+                 error('Test failed!') // Abort the pipeline with an error status
                 }
             }
         }
