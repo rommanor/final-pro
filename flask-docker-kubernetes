@@ -63,6 +63,7 @@ pipeline {
                 }
             }
         }
+}
         stage('deploy to cluster') {
             steps {
                 script {
