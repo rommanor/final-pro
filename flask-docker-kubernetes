@@ -55,7 +55,7 @@ pipeline {
             sh 'echo "Running tests..."'
             
             // Make an HTTP request to the test server and capture the response status code
-            def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://$test-server-ip:$test-server-port', returnStdout: true).trim()
+            def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://${test-server-ip}:${test-server-port}', returnStdout: true).trim()
             
             // Check if the response status code is 200 (OK)
             if (response == '200') {
