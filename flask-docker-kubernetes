@@ -51,19 +51,24 @@ pipeline {
             }
         }
         stage('Testing') {
-            steps {
-                script {
-                    sh 'echo "Running tests..."'
-                     //check if its available
-                 if (response.trim() == '200') {
-                 echo 'Flask app returned a 200 status code. Test passed!'
-                     } else {
-                 echo "Flask app returned a non-200 status code: ${response.trim()}. Test failed!"
-                 error('Test failed!') // Abort the pipeline with an error status
-                }
+    steps {
+        script {
+            sh 'echo "Running tests..."'
+            
+            // Make a request to the test server on Rancher Desktop and capture the response status code
+            def response = sh(script: 'kubectl run curl --image=radial/busyboxplus:curl -i --rm --restart=Never -- curl -s -o /dev/null -w "%{http_code}" http://flask-app-service1:30619', returnStdout: true).trim()
+            
+            // Check if the response status code is 200 (OK)
+            if (response == '200') {
+                echo 'Flask app returned a 200 status code. Test passed!'
+            } else {
+                echo "Flask app returned a non-200 status code: ${response}. Test failed!"
+                error('Test failed!') // Abort the pipeline with an error status
             }
         }
+    }
 }
+
         stage('deploy to cluster') {
             steps {
                 script {
