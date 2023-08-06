@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        test_server_ip = '172.28.255.39'
+        test_server_ip = '172.31.198.44'
         test_server_port = '31560'
     }
     stages {
