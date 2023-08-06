@@ -72,7 +72,7 @@ pipeline {
         stage('deploy to cluster') {
             steps {
  script {
-                    sh 'kubectl config use-context gke_elegant-azimuth-393211_us-east1_cluster-pro'  
+                    sh 'kubectl config use-context gke_elegant-azimuth-393211_europe-central2_cluster-pro'  
                     sh 'echo "Pulling Docker image from Docker Hub..."'
                     sh 'kubectl apply -f /var/lib/jenkins/workspace/flask-docker-kubernetes/final-pro/flask-app-deployment-ser.yaml' // Apply Kubernetes deployment manifest for test server
                     sh '''
