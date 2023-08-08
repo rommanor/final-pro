@@ -1,1 +1,84 @@
+pipeline {
+    agent any
+    environment {
+        test_server_ip = '172.23.10.180'
+        test_server_port = '31560'
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                sh 'echo "Performing cleanup..."'
+                sh 'rm -rf *'
+                sh 'docker image prune -a -f '
+                sh 'docker container prune -f '
+            }
+        }
+        stage('Clone') {
+            steps {
+                sh 'echo "Building..."'
+                sh 'git clone https://github.com/rommanor/final-pro.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo "Building Docker image..."'
+                dir('final-pro') {
+                    sh "docker build -t rommanor/final-pro:latest ."
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'echo "Pushing Docker image to Docker Hub..."'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push rommanor/final-pro
+                    '''
+                }
+            }
+        }
+        stage('prep test srv') {
+            steps {
+                script {
+                    sh 'kubectl config use-context rancher-desktop'
+                    sh 'echo "Pulling Docker image from Docker Hub..."'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/flask-docker-kubernetes/final-pro/flask-app-deployment-ser.yaml' // Apply Kubernetes deployment manifest for test server
+                    sh '''
+                    '''
+                }
+            }
+        }
+      stage('Testing') {
+    steps {
+        script {
+            sh 'echo "Running tests..."'
+            
+            // Make an HTTP request to the test server and capture the response status code
+            def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://${test_server_ip}:${test_server_port}', returnStdout: true).trim()
+            
+            // Check if the response status code is 200 (OK)
+            if (response == '200') {
+                echo 'Application returned a 200 status code. Test passed!'
+            } else {
+                echo "Application returned a non-200 status code: ${response}. Test failed!"
+                error('Test failed!') // Abort the pipeline with an error status
+            }
+        }
+    }
+}
 
+
+        stage('deploy to cluster') {
+            steps {
+ script {
+                    sh 'kubectl config use-context gke_elegant-azimuth-393211_europe-central2_cluster-pro'  
+                    sh 'echo "Pulling Docker image from Docker Hub..."'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/flask-docker-kubernetes/final-pro/flask-app-deployment-ser.yaml' // Apply Kubernetes deployment manifest for test server
+                    sh '''
+                    '''
+                }
+            }
+        }
+    }
+}
