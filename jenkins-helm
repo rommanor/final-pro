@@ -1,1 +1,99 @@
+pipeline {
+    agent any
+    environment {
+        test_server_ip = '172.23.10.180'
+        test_server_port = '31560'
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                sh 'echo "Performing cleanup..."'
+                sh 'rm -rf *'
+                sh 'docker image prune -a -f '
+                sh 'docker container prune -f '
+            }
+        }
+        stage('Clone') {
+            steps {
+                sh 'echo "Building..."'
+                sh 'git clone https://github.com/rommanor/final-pro.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo "Building Docker image..."'
+                dir('final-pro') {
+                    sh "docker build -t rommanor/final-pro:latest ."
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'echo "Pushing Docker image to Docker Hub..."'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push rommanor/final-pro
+                    '''
+                }
+            }
+        }
+      stage('Fetch Latest Helm Chart') {
+            steps {
+                withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
+                    sh 'gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"'
+                    script {
+                        def helmCharts = sh(script: 'gsutil ls gs://flask_helm/helm-project*.tgz | sort', returnStdout: true).trim().split("\n")
+                        def latestChart = helmCharts[helmCharts.size() - 1]
+                        env.LATEST_CHART = latestChart.split("/").last()
+                    }
+                    echo "Latest chart to copy: ${env.LATEST_CHART}"
+                    sh "gsutil cp gs://flask_helm/${env.LATEST_CHART} ."
+                }
+            }
+        }
+        stage('running kubernetes on test') {
+            steps {
+                sh 'kubectl config use-context rancher-desktop'
+                sh 'kubectl delete deployments --all'
+                sh 'kubectl delete services --all'
+                sh 'helm uninstall my-release-name'
+                sh "helm install my-release-name ${env.LATEST_CHART}"
+                sh 'kubectl get nodes -o wide'
+            }
+        }
+        stage('Testing') {
+            steps {
+                sh 'kubectl config get-contexts'
+                sh 'bash /var/lib/jenkins/workspace/kubecloud_pipeline/flask-project/jenkins/test_localkube.sh flask-app-service'
+            }
+        }
+        stage('deploy to prod') {
+            steps {
+                withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
+                    sh 'gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"'
+                    sh 'gcloud container clusters get-credentials cluster-1 --region us-central1-a --project disco-rope-393211'
+                    sh 'kubectl delete deployments --all'
+                    sh 'kubectl delete services --all'
+                    sh "helm install my-release-name ${env.LATEST_CHART}"
+                    sh 'sleep 60'
+                    sh 'kubectl get svc flask-app-service'
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
