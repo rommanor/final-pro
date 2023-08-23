@@ -52,7 +52,7 @@ pipeline {
                 }
             }
         }
-        stage('running kubernetes on test') {
+        stage('Running kubernetes on test') {
             steps {
                 sh 'kubectl config use-context rancher-desktop'
                 sh 'kubectl delete deployments --all'
