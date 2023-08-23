@@ -43,7 +43,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
                     sh 'gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"'
                     script {
-                        def helmCharts = sh(script: 'gsutil ls gs://bucket-pro/helm-project*.tgz | sort', returnStdout: true).trim().split("\n")
+                        def helmCharts = sh(script: 'gsutil ls gs://bucket-pro/romapp*.tgz | sort', returnStdout: true).trim().split("\n")
                         def latestChart = helmCharts[helmCharts.size() - 1]
                         env.LATEST_CHART = latestChart.split("/").last()
                     }
