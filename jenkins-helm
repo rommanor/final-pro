@@ -63,11 +63,24 @@ pipeline {
             }
         }
         stage('Testing') {
-            steps {
-                sh 'kubectl config get-contexts'
-                sh 'bash /var/lib/jenkins/workspace/kubecloud_pipeline/flask-project/jenkins/test_localkube.sh flask-app-service'
+    steps {
+        script {
+            sh 'echo "Running tests..."'
+            
+            // Make an HTTP request to the test server and capture the response status code
+            def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://${test_server_ip}:${test_server_port}', returnStdout: true).trim()
+            
+            // Check if the response status code is 200 (OK)
+            if (response == '200') {
+                echo 'Application returned a 200 status code. Test passed!'
+            } else {
+                echo "Application returned a non-200 status code: ${response}. Test failed!"
+                error('Test failed!') // Abort the pipeline with an error status
             }
         }
+    }
+}
+
         stage('deploy to prod') {
             steps {
                 withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
