@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         test_server_ip = '172.30.173.238'
-        test_server_port = '32447'
+        test_server_port = '30481'
     }
     stages {
         stage('Cleanup') {
