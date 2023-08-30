@@ -57,7 +57,7 @@ pipeline {
                 sh 'kubectl config use-context rancher-desktop'
                 sh 'kubectl delete deployments --all'
                 sh 'kubectl delete services --all'
-                sh "helm install my-release-name ${env.LATEST_CHART}"
+                sh "helm upgrade --install my-release-name ${env.LATEST_CHART}"
                 sh 'kubectl get nodes -o wide'
             }
         }
