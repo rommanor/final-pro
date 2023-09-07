@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        test_server_ip = env.TEST_SERVER_IP
-        test_server_port = env.TEST_SERVER_PORT
+        test_server_ip = '172.30.173.238'
+        test_server_port = '31668'
     }
     stages {
         stage('Cleanup') {
@@ -64,10 +64,17 @@ pipeline {
         stage('Testing') {
     steps {
         script {
-                    sh 'echo "Running tests..."'
-                    // Use test_server_ip and test_server_port
-                    def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://${test_server_ip}:${test_server_port}', returnStdout: true).trim()
-                    // ... Rest of your testing logic ...
+            sh 'echo "Running tests..."'
+            
+            // Make an HTTP request to the test server and capture the response status code
+            def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://${test_server_ip}:${test_server_port}', returnStdout: true).trim()
+            
+            // Check if the response status code is 200 (OK)
+            if (response == '200') {
+                echo 'Application returned a 200 status code. Test passed!'
+            } else {
+                echo "Application returned a non-200 status code: ${response}. Test failed!"
+                error('Test failed!') // Abort the pipeline with an error status
             }
         }
     }
@@ -85,17 +92,3 @@ pipeline {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
