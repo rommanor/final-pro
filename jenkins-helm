@@ -71,7 +71,7 @@ pipeline {
             }
         }
     }
-
+}
 
         stage('deploy to prod') {
             steps {
