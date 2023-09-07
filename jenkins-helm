@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         test_server_ip = '172.30.173.238'
-        test_server_port = '31668'
+        test_server_port = '32662'
     }
     stages {
         stage('Cleanup') {
@@ -56,7 +56,7 @@ pipeline {
             steps {
                 sh 'kubectl config use-context rancher-desktop'
                 sh 'kubectl delete deployments --all'
-                sh 'kubectl delete services --all'
+                // sh 'kubectl delete services --all'
                 sh "helm upgrade --install my-release-name ${env.LATEST_CHART}"
                 sh 'kubectl get nodes -o wide'
             }
