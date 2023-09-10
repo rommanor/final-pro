@@ -3,7 +3,10 @@ pipeline {
     environment {
         test_server_ip = '172.30.173.238'
          // test_server_port = '32662'
-        test_server_port = "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get service flask-app-service1 -o=jsonpath='{.spec.ports[?(@.port==80)].nodePort}'"
+        test_server_port =sh(
+        script: 'kubectl --kubeconfig=/var/lib/jenkins/.kube/config get service flask-app-service1 -o=jsonpath="{.spec.ports[?(@.port==80)].nodePort}"',
+        returnStdout: true
+    ).trim()
 
     }
     stages {
