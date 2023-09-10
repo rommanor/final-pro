@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        sh 'kubectl config use-context rancher-desktop'
         test_server_ip = '172.30.173.238'
          // test_server_port = '32662'
         test_server_port =sh(
