@@ -85,7 +85,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
                     sh 'gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"'
                     sh 'gcloud container clusters get-credentials cluster-1093 --region=europe-central2-a --project=elegant-azimuth-393211'
-                    sh "helm install my-release-name ${env.LATEST_CHART}"
+                    sh "helm upgrade --install my-release-name ${env.LATEST_CHART}"
                     sh 'sleep 60'
                 }
             }
