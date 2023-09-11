@@ -87,7 +87,7 @@ pipeline {
     }
 }
 
-        stage('deploy to prod') {
+        stage('Deploy to prod') {
             steps {
                 withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GCLOUD_CREDS')]) {
                     sh 'gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"'
