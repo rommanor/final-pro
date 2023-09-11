@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         test_server_ip = '172.30.173.238'
-         // test_server_port = '32662'
         test_server_port =sh(
         script: 'kubectl --kubeconfig=/var/lib/jenkins/.kube/config get service flask-app-service1 -o=jsonpath="{.spec.ports[?(@.port==80)].nodePort}"',
         returnStdout: true
@@ -63,7 +62,6 @@ pipeline {
             steps {
                 sh 'kubectl config use-context rancher-desktop'
                 sh 'kubectl delete deployments --all'
-                // sh 'kubectl delete services --all'
                 sh "helm upgrade --install my-release-name ${env.LATEST_CHART}"
                 sh 'kubectl get nodes -o wide'
             }
